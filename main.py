@@ -21,8 +21,18 @@ while True:
     # frame means the matrix of the image (numpy array)
 
     check, frames = video.read()
-    cv2.imshow("My video", frames)
+    # convert this frames to gaussian grey frame.
+    gray_frame = cv2.cvtColor(frames, cv2.COLOR_BGR2GRAY)
+
+    """GaussianBlur is blurring technique which decrease from 
+        a center point (bell-shaped curve.)"""
+    # Here we have (frame, blur_value, deviation
+    gaussian_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
+
+    cv2.imshow("My video", gaussian_frame)
+
     #     To exit from while loop we uses a key (if key == q) exit.
+    # Create a keyboard key and then on press of it exit.
     key = cv2.waitKey(1)
     if key == ord("q"):
         break
