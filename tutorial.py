@@ -1,7 +1,7 @@
 import cv2
 
 # This array is a numpy array which reads the image(rgb matrices)
-array = cv2.imread("image.png")
+array = cv2.imread("myimage.png")
 
 """array.shape will give dimension of image matrix.
     (row, columns, color channels)
