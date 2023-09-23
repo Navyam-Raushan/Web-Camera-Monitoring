@@ -2,8 +2,17 @@ import cv2
 from datetime import datetime
 import streamlit as st
 import time
+import os
 import glob
 from emailing import send_mail
+from threading import Thread
+
+
+def clean_folder():
+    images = glob.glob("images/*.png")
+    for image in images:
+        os.remove(image)
+
 
 st.title("Motion Detector")
 start = st.button("Start Camera")
@@ -11,6 +20,9 @@ start = st.button("Start Camera")
 # """0 : to start primary camera
 #    1 : to start secondary(attached camera)
 # """
+st.info("Please press stop button after few seconds.")
+stop_button = st.button("Stop Camera")
+
 if start:
     streamlit_img = st.image([])
     camera = cv2.VideoCapture(0)
@@ -86,9 +98,9 @@ if start:
                 count = count + 1
                 all_images = glob.glob("images/*.png")
 
-            # chhosing mid image
-            index = int(len(all_images)/2)
-            mid_image = all_images[index]
+                # chhosing mid image
+                index = int(len(all_images) / 2)
+                mid_image = all_images[index]
 
         status_list.append(status)
         status_list = status_list[-2:]
@@ -96,7 +108,15 @@ if start:
 
         # LOGIC TO SEND MAIL
         if status_list[0] == 1 and status_list[1] == 0:
-            send_mail(mid_image)
+            # Args must be a tuple otherwise it will produce error.
+            email_thread = Thread(target=send_mail, args=(mid_image, ))
+            email_thread.daemon = True
+            clean_thread = Thread(target=clean_folder)
+            clean_thread.daemon = True
+
+            # STARTING THE THREADS
+            email_thread.start()
+            clean_thread.start()
         # When we get the rect set status to 1
         # """so the idea is when object is just exit
         #    status will change 1 to 0 then we have to send a mail."""
@@ -117,8 +137,11 @@ if start:
         key = cv2.waitKey(1)
         if key == ord("q"):
             break
+        if stop_button:
+            camera.release()
+            break
 
-    # camera.release()
+
 
 # """The exit part takes q from keyboard
 #     if user presses key the loop will terminate

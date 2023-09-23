@@ -36,4 +36,4 @@ def send_mail(image_path):
 
 
 if __name__ == "__main__":
-    send_mail()
+    send_mail("images/41.png")
